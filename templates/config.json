@@ -1,0 +1,6 @@
+{
+    "token": "<from BotFather>",
+    "username": "<bot name>",
+    "admin": [<Admin ID list>],
+    "allowed": [<Allowed action for ID list>]
+}
