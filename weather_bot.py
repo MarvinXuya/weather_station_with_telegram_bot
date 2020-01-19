@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                     datefmt='%a, %d %b %Y %H:%M:%S',
                     filename='/var/log/chango_leon.log')
-CONFIG = json.loads(open('./templates/config.json', 'r').read())
+CONFIG = json.loads(open('./config_files/config.json', 'r').read())
 
 updater = Updater(token = CONFIG['token'])
 dispatcher = updater.dispatcher
