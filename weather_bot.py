@@ -18,8 +18,8 @@ import datetime
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                     datefmt='%a, %d %b %Y %H:%M:%S',
-                    filename='chango_leon.log')
-CONFIG = json.loads(open('./config.json', 'r').read())
+                    filename='/var/log/chango_leon.log')
+CONFIG = json.loads(open('./templates/config.json', 'r').read())
 
 updater = Updater(token = CONFIG['token'])
 dispatcher = updater.dispatcher
