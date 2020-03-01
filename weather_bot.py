@@ -4,7 +4,11 @@ import logging
 import telegram
 from telegram.ext import Updater, Filters, CommandHandler, MessageHandler
 import json
-#
+#if mysql is setup
+import MySQLdb
+#tunnel
+from pyngrok import ngrok
+
 
 # Inicio weather
 import glob, time
@@ -15,25 +19,94 @@ import datetime
 #
 
 # bot conf
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
-                    datefmt='%a, %d %b %Y %H:%M:%S',
-                    filename='/var/log/chango_leon.log')
 CONFIG = json.loads(open('./config_files/config.json', 'r').read())
-
 updater = Updater(token = CONFIG['token'])
 dispatcher = updater.dispatcher
 jobqueue = updater.job_queue
 me = updater.bot.get_me()
-CONFIG['username'] = '@' + me.username
+CONFIG['user_name'] = '@' + me.username
 USER = CONFIG['allowed']
+LOG_PATH = CONFIG['log_path']
+UNKNOWN_USERS_PATH=CONFIG['unknown_path']
+NGROK_TOKEN = CONFIG['ngrok_token']
+
+# Tunnel conf
+public_url=""
+ngrok.set_auth_token(NGROK_TOKEN)
+def connect_tunnel(bot : telegram.Bot, update : telegram.Update):
+    global public_url
+    date = datetime.datetime.now()
+    now = str(date.strftime("%Y-%m-%d %H:%M:%S"))
+    public_url = ngrok.connect(3000)
+    message = ( now
+    + "\nURL: " + public_url
+    )
+    update.message.reply_text(message)
+
+def disconnect_tunnel(bot : telegram.Bot, update : telegram.Update):
+    global public_url
+    date = datetime.datetime.now()
+    now = str(date.strftime("%Y-%m-%d %H:%M:%S"))
+    ngrok.disconnect(public_url)
+    ngrok.kill()
+    tunnels = ngrok.get_tunnels()
+    message = ( now
+    + "\nactive: " + str(tunnels)
+    )
+    update.message.reply_text(message)
+
+def get_tunnels(bot : telegram.Bot, update : telegram.Update):
+    tunnels = ngrok.get_tunnels()
+    date = datetime.datetime.now()
+    now = str(date.strftime("%Y-%m-%d %H:%M:%S"))
+    message = ( now
+    + "\nactive: " + str(tunnels)
+    )
+    update.message.reply_text(message)
+
+# Logs
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                    datefmt='%a, %d %b %Y %H:%M:%S',
+                    filename=LOG_PATH)
+
+
 
 def echo_start(bot : telegram.Bot, update : telegram.Update):
     print(update.message.from_user)
     if update.message.from_user.id in USER:
         update.message.reply_text('Welcome to the mx madhouse')
     else:
-        update.message.reply_text('Ops! you are not allowed')
+        reply_deny_message='Ops! ' + str(update.message.from_user.first_name) +' you are not allowed to do it.'
+        update.message.reply_text(reply_deny_message)
+        unknown_user(update.message.from_user.id,update.message.from_user.first_name)
+
+
+def write_json(data, filename=UNKNOWN_USERS_PATH):
+    with open(filename,'w') as f:
+        json.dump(data, f, indent=4)
+
+def unknown_user(id, name):
+    result=False
+    unknown_data = json.loads(open(UNKNOWN_USERS_PATH, 'r').read())
+    for count,_name in enumerate(unknown_data):
+        if unknown_data[count].get('id') != id:
+            result = True
+        else:
+            result = False
+
+    if result:
+        print('escribiendo: ' + str(id) + str(name))
+        with open(UNKNOWN_USERS_PATH) as json_file:
+            data = json.load(json_file)
+            temp = data
+            y = {"name": name,
+             "id": id
+            }
+            # appending data to emp_details
+            temp.append(y)
+        write_json(data)
+
 
 class DS18B20(object):
     def __init__(self):
@@ -78,21 +151,32 @@ def get_weather(bot : telegram.Bot, update : telegram.Update):
         bme280.load_calibration_params(bus,address)
         global chat_id
         bme280_data = bme280.sample(bus,address)
-        humidity  = bme280_data.humidity
-        pressure  = bme280_data.pressure
-        ambient_temperature = bme280_data.temperature
-        now = datetime.datetime.now()
+        humidity = str(round(bme280_data.humidity,2))+ "%"
+        pressure = str(round(bme280_data.pressure,2))
+        ambient_temperature = str(round(bme280_data.temperature,2)) +  "C"
+        date = datetime.datetime.now()
+        now = str(date.strftime("%Y-%m-%d %H:%M:%S"))
         obj = DS18B20()
-        update.message.reply_text(str(now.strftime("%Y-%m-%d %H:%M:%S")))
-        update.message.reply_text("Humedad: " + str(round(humidity,2))+ "%" )
-        update.message.reply_text("Presion: " + str(round(pressure,2)))
-        update.message.reply_text("Temperatura: " + str(round(ambient_temperature,2)) +  " - Temp2: %s C" % obj.read_temp())
+        message = ( now
+        + "\nHumedad: " + humidity
+        + "\nPresion: " + pressure
+        + "\nTemperatura: "
+        + "\n             bme280:  " +  ambient_temperature
+        + "\n             ds18b20: " +  "%s C" % obj.read_temp()
+        )
+        update.message.reply_text(message)
     else:
-        update.message.reply_text('Ops! you are not allowed')
+        reply_deny_message='Ops! ' + str(update.message.from_user.first_name) +' you are not allowed to do it.'
+        update.message.reply_text(reply_deny_message)
+        unknown_user(update.message.from_user.id,update.message.from_user.first_name)
 
 # Place actions
 dispatcher.add_handler(CommandHandler('start', echo_start))
 dispatcher.add_handler(CommandHandler('weather', get_weather))
+dispatcher.add_handler(CommandHandler('grafana', connect_tunnel))
+dispatcher.add_handler(CommandHandler('disconnect_grafana', disconnect_tunnel))
+dispatcher.add_handler(CommandHandler('tunnels', get_tunnels))
+
 # Start bot
 updater.start_polling()
 updater.idle()

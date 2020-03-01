@@ -1,6 +1,12 @@
 {
     "token": "<from BotFather>",
-    "username": "<bot name>",
+    "user_name": "<bot name>",
     "admin": [<Admin ID list>],
-    "allowed": [<Allowed action for ID list>]
+    "allowed": [<Allowed action for ID list>],
+    "log_path": "<Log path>",
+    "unknown_path": "<Unknown path>",
+    "mysql_user": "<Mysql user>",
+    "mysql_password": "<Mysql password>",
+    "mysql_user": "<Mysql user>",
+    "ngrok_token": "<NGROK token>"
 }
