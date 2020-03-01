@@ -1,6 +1,6 @@
-# Weather Station with telegram bot
+# Weather Station with Telegram bot, NGRock and Grafana for Raspberry Pi
 
-Python code for Raspberry Pi (Raspberry Pi Zero W), using mostly Adafruit parts.
+Python code for Raspberry Pi (Used on Raspberry Pi Zero W), using mostly Adafruit parts.
 Inside the code you will find that:
 - It uses telegram bots to get access to you data.
 - Grafana to display data.
