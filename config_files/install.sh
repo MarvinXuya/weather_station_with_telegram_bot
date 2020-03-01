@@ -5,18 +5,28 @@ bot_name=${1}
 sudo apt-get update
 sudo apt-get install -y python3.6
 sudo apt-get install -y python3-pip
+sudo apt-get install -y python3-distutils
 sudo apt-get install -y mariadb-server mariadb-client libmariadbclient-dev
-sudo pip3 install /home/pi/weather_station_with_telegram_bot/config_files/requirements.txt
+sudo apt --fix-broken install -y
+sudo apt-get install -y python3-testresources
+curl https://bootstrap.pypa.io/get-pip.py | python3
+sudo python3 -m pip install -r /home/pi/weather_station_with_telegram_bot/config_files/requirements.txt
 
 sudo cp /home/pi/weather_station_with_telegram_bot/templates/bot_name.conf /etc/logrotate.d/${bot_name}
-sed -i "s/<bot_name>/${bot_name}/g" /etc/logrotate.d/${bot_name}
+sudo sed -i "s/<bot_name>/${bot_name}/g" /etc/logrotate.d/${bot_name}
 chmod 544 /etc/logrotate.d/${bot_name}
 
 wget https://dl.grafana.com/oss/release/grafana-rpi_6.6.1_armhf.deb
 sudo dpkg -i grafana-rpi_6.6.1_armhf.deb
+sleep 30
 sudo systemctl enable grafana-server
 sudo systemctl start grafana-server
 
-sudo cp /home/pi/weather_station_with_telegram_bot/templates/startup.sh /etc/logrotate.d/startup.sh
+sudo cp /home/pi/weather_station_with_telegram_bot/templates/startup.sh /etc/init.d/startup.sh
 sudo chmod 755 /etc/init.d/startup.sh
 sudo update-rc.d -f startup.sh defaults
+
+sudo echo w1-gpio >> /etc/modules
+sudo echo w1-therm >> /etc/modules
+
+sudo echo dtoverlay=w1-gpio >> /boot/config.txt

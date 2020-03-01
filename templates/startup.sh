@@ -18,15 +18,15 @@ case "$1" in
     echo none | sudo tee /sys/class/leds/led0/trigger
     echo 1 | sudo tee /sys/class/leds/led0/brightness
     cd /home/pi/weather_station_with_telegram_bot
-    echo "Starting Bot for telegram"
-    nohup sudo python3.6 weather_bot.py &
     while !(sudo mysqladmin ping)
     do
        sleep 3
        echo "waiting for mysql ..."
     done
+    echo "Starting Bot for telegram"
+    nohup sudo python3 weather_bot.py &
     echo "Starting mysql script for weather station"
-    nohup python3.6 weather.py &
+    nohup python3 weather.py &
     ;;
   *)
     echo "Usage: /etc/init.d/startup.sh {start}"
