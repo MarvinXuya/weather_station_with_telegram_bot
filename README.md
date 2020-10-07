@@ -21,6 +21,7 @@ Version: python 3.6
 ## Before starting
 - Git should be installed and repository in place:
 ```
+sudo apt-get update
 sudo apt-get install git -y
 git clone https://github.com/MarvinXuya/weather_station_with_telegram_bot.git /home/pi/weather_station_with_telegram_bot
 ```
