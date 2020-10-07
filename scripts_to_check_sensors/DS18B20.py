@@ -3,17 +3,19 @@
 # sudo echo w1-gpio >> /etc/modules
 # sudo echo w1-therm >> /etc/modules
 # sudo echo dtoverlay=w1-gpio >> /boot/config.txt
-### It will test two sensors
+# It will test two sensors
 
-import glob, time
+import glob
+import time
 import bme280
 import smbus2
-from time import sleep
 import datetime
+
 
 class DS18B20(object):
     def __init__(self):
-        self.device_file = glob.glob("/sys/bus/w1/devices/28*")[0] + "/w1_slave"
+        self.device_file = glob.glob("/sys/bus/w1/devices/28*")[0]
+        + "/w1_slave"
 
     def read_temp_raw(self):
         f = open(self.device_file, "r")
@@ -45,26 +47,25 @@ class DS18B20(object):
                 temp_c = float(temp_string)/1000.0
         return temp_c
 
+
 obj = DS18B20()
-print( obj.read_temp())
-
-
+print(obj.read_temp())
 port = 1
-address = 0x77 # Adafruit BME280 address. Other BME280s may be different
+address = 0x77  # Adafruit BME280 address. Other BME280s may be different
 bus = smbus2.SMBus(port)
-bme280.load_calibration_params(bus,address)
+bme280.load_calibration_params(bus, address)
 global chat_id
-bme280_data = bme280.sample(bus,address)
-humidity = str(round(bme280_data.humidity,2))+ "%"
-pressure = str(round(bme280_data.pressure,2))
-ambient_temperature = str(round(bme280_data.temperature,2)) +  "C"
+bme280_data = bme280.sample(bus, address)
+humidity = str(round(bme280_data.humidity, 2)) + "%"
+pressure = str(round(bme280_data.pressure, 2))
+ambient_temperature = str(round(bme280_data.temperature, 2)) + "C"
 date = datetime.datetime.now()
 now = str(date.strftime("%Y-%m-%d %H:%M:%S"))
 obj = DS18B20()
-message = ( now
-+ "\nHumedad: " + humidity
-+ "\nPresion: " + pressure
-+ "\nTemperatura: "
-+ "\n             bme280:  " +  ambient_temperature
-)
+message = (now
+           + "\nHumedad: " + humidity
+           + "\nPresion: " + pressure
+           + "\nTemperatura: "
+           + "\n             bme280:  " + ambient_temperature
+           )
 print(message)
