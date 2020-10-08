@@ -3,13 +3,9 @@
 # sudo echo w1-gpio >> /etc/modules
 # sudo echo w1-therm >> /etc/modules
 # sudo echo dtoverlay=w1-gpio >> /boot/config.txt
-# It will test two sensors
 
 import glob
 import time
-import bme280
-import smbus2
-import datetime
 
 
 class DS18B20(object):
@@ -48,24 +44,5 @@ class DS18B20(object):
         return temp_c
 
 
-obj = DS18B20()
-print(obj.read_temp())
-port = 1
-address = 0x77  # Adafruit BME280 address. Other BME280s may be different
-bus = smbus2.SMBus(port)
-bme280.load_calibration_params(bus, address)
-global chat_id
-bme280_data = bme280.sample(bus, address)
-humidity = str(round(bme280_data.humidity, 2)) + "%"
-pressure = str(round(bme280_data.pressure, 2))
-ambient_temperature = str(round(bme280_data.temperature, 2)) + "C"
-date = datetime.datetime.now()
-now = str(date.strftime("%Y-%m-%d %H:%M:%S"))
-obj = DS18B20()
-message = (now
-           + "\nHumedad: " + humidity
-           + "\nPresion: " + pressure
-           + "\nTemperatura: "
-           + "\n             bme280:  " + ambient_temperature
-           )
-print(message)
+temperature = DS18B20()
+print(temperature.read_temp())

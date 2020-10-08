@@ -12,4 +12,5 @@
     "bme280": "False",
     "ds18b20": "False",
     "si7021": "False",
+    "COUNTRY": "< country to get covid data from bing>"
 }

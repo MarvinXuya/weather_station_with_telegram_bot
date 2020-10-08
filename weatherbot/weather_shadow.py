@@ -1,17 +1,13 @@
 # bot
-import os
-import logging
 import json
 import MySQLdb
-#
-
 # Starting weather
-import glob, time
+import glob
+import time
 import bme280
 import smbus2
 from time import sleep
 import datetime
-#
 
 CONFIG = json.loads(open('./config_files/config.json', 'r').read())
 MYSQL_USER = CONFIG['mysql_user']
@@ -26,7 +22,8 @@ logf = open("/var/log/mysql_chango.log", "w")
 
 class DS18B20(object):
     def __init__(self):
-        self.device_file = glob.glob("/sys/bus/w1/devices/28*")[0] + "/w1_slave"
+        self.device_file = glob.glob("/sys/bus/w1/devices/28*")[0]
+        + "/w1_slave"
 
     def read_temp_raw(self):
         f = open(self.device_file, "r")
@@ -58,32 +55,38 @@ class DS18B20(object):
                 temp_c = float(temp_string)/1000.0
         return temp_c
 
+
 port = 1
-address = 0x77 # Adafruit BME280 address. Other BME280s may be different
+address = 0x77  # Adafruit BME280 address. Other BME280s may be different
 while True:
-    check=0
     try:
         bus = smbus2.SMBus(port)
-        bme280.load_calibration_params(bus,address)
-        bme280_data = bme280.sample(bus,address)
-        humidity  = bme280_data.humidity
-        pressure  = bme280_data.pressure
+        bme280.load_calibration_params(bus, address)
+        bme280_data = bme280.sample(bus, address)
+        humidity = bme280_data.humidity
+        pressure = bme280_data.pressure
         ambient_temperature = bme280_data.temperature
         now = datetime.datetime.now()
         obj = DS18B20()
         temperatura_DS18B20 = obj.read_temp()
+        if 'bus' in locals():
+            bus.close()
     except Exception as e:
         logf.write("Not able to get data from artifacts: {}\n".format(str(e)))
         if 'bus' in locals():
             bus.close()
         continue
     try:
-        connection = MySQLdb.connect(user=MYSQL_USER, password=MYSQL_PASSWORD, database=MYSQL_DATABASE)
-        cursor=connection.cursor()
+        connection = MySQLdb.connect(user=MYSQL_USER,
+                                     password=MYSQL_PASSWORD,
+                                     database=MYSQL_DATABASE)
+        cursor = connection.cursor()
         cursor.executemany(
-              """INSERT INTO botdata (date_time, humedad, presion, temperatura, temperatura_DS18B20)
+              """INSERT INTO botdata (date_time, humedad, presion,
+              temperatura, temperatura_DS18B20)
               VALUES (%s, %s, %s, %s, %s)""",
-              [(now,humidity,pressure,ambient_temperature,temperatura_DS18B20)] )
+              [(now, humidity, pressure, ambient_temperature,
+                temperatura_DS18B20)])
         connection.commit()
         connection.close()
     except Exception as e:
