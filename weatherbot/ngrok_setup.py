@@ -2,7 +2,8 @@
 from pyngrok import ngrok
 import json
 
-CONFIG = json.loads(open('./config_files/config.json', 'r').read())
+CONFIG = json.loads(open('/home/pi/weather_station_with_telegram_bot\
+/config_files/config.json', 'r').read())
 NGROK_TOKEN = CONFIG['ngrok_token']
 ngrok.set_auth_token(NGROK_TOKEN)
 

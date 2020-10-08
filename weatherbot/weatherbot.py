@@ -10,18 +10,19 @@ import gzip
 # if mysql is setup
 import MySQLdb
 # tunnel
-from . import ngrok_setup
+import ngrok_setup
 # weathersastion
 import datetime
-from . import get_bme280
-from . import get_si7021
-from . import get_ds18b20
+import get_bme280
+import get_si7021
+import get_ds18b20
 # covid data
-from . import covid
+import covid
 
 
 # bot conf
-CONFIG = json.loads(open('./config_files/config.json', 'r').read())
+CONFIG = json.loads(open('/home/pi/weather_station_with_telegram_bot\
+/config_files/config.json', 'r').read())
 updater = Updater(token=CONFIG['token'])
 dispatcher = updater.dispatcher
 jobqueue = updater.job_queue
