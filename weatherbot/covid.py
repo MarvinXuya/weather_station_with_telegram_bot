@@ -21,9 +21,10 @@ def get_data(country):
             totalDeaths = data.get('totalDeaths')
             lastUpdated = data.get('lastUpdated')
             active = totalConfirmed - totalRecovered - totalDeaths
-            message = (country.capitalize() + ":\n- Active: {}\n- Confirmed: {}\n- Recovered:\
- {}\n- Deaths: {}\n- Date: {}").format(active, totalConfirmed, totalRecovered,
-                                       totalDeaths, lastUpdated)
+            message = ("\n"+country.capitalize() + ":\n- Active: {}\n- Confirmed: {}\n- Recovered:\
+ {}\n- Deaths: {}\n- Data date: {}").format(active, totalConfirmed,
+                                            totalRecovered, totalDeaths,
+                                            lastUpdated)
             return message
         except Exception:
             message = 'Not able to load json'

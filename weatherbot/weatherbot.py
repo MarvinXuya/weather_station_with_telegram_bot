@@ -147,7 +147,7 @@ def update_users(bot: telegram.Bot, update: telegram.Update):
 def connect_tunnel(bot: telegram.Bot, update: telegram.Update):
     if update.message.from_user.id in USER:
         global public_url
-        message = (get_date + ngrok_setup.connect_tunnel)
+        message = (get_date() + ngrok_setup.connect_tunnel)
         update.message.reply_text(message)
     else:
         reply_deny_message = 'Ops! '
@@ -160,7 +160,7 @@ def connect_tunnel(bot: telegram.Bot, update: telegram.Update):
 
 def disconnect_tunnel(bot: telegram.Bot, update: telegram.Update):
     if update.message.from_user.id in USER:
-        message = (get_date + ngrok_setup.disconnect_tunnel)
+        message = (get_date() + ngrok_setup.disconnect_tunnel)
         update.message.reply_text(message)
     else:
         reply_deny_message = 'Ops! '
@@ -173,7 +173,7 @@ def disconnect_tunnel(bot: telegram.Bot, update: telegram.Update):
 
 def get_tunnels(bot: telegram.Bot, update: telegram.Update):
     if update.message.from_user.id in USER:
-        message = (get_date + ngrok_setup.get_tunnels)
+        message = (get_date() + ngrok_setup.get_tunnels)
         update.message.reply_text(message)
     else:
         reply_deny_message = 'Ops! '
@@ -191,7 +191,7 @@ def get_last_data(bot: telegram.Bot, update: telegram.Update):
                                          password=MYSQL_PASSWORD,
                                          database=MYSQL_DATABASE)
         except connection.error:
-            message = (get_date
+            message = (get_date()
                        + "\n No puedo comunicarme con mi base de datos.")
             update.message.reply_text(message)
         cursor = connection.cursor()
@@ -206,7 +206,7 @@ def get_last_data(bot: telegram.Bot, update: telegram.Update):
         presion = result[2]
         temperatura = result[3]
         temperatura_DS18B20 = result[4]
-        message = (get_date
+        message = (get_date()
                    + "\nUltima fecha: " + str(date_time)
                    + "\nHumedad: " + str(humedad)
                    + "\nPresion: " + str(presion)
@@ -255,7 +255,7 @@ def covid_data(bot: telegram.Bot, update: telegram.Update):
        (update.message.from_user.id in COVID_USER):
         try:
             update.message.reply_text("Updating data, will be back soon")
-            message = (get_date + covid.get_data(COUNTRY))
+            message = (get_date() + covid.get_data(COUNTRY))
             update.message.reply_text("Data updated")
             update.message.reply_text(message)
         except logging.error:
@@ -274,10 +274,13 @@ def get_weather(bot: telegram.Bot, update: telegram.Update):
     print(update.message.from_user)
     if update.message.from_user.id in USER:
         try:
-            message = (get_date
-                       + ['', get_bme280.get_bme280][add_bme280]
-                       + ['', get_si7021.get_si7021][add_si7021]
-                       + ['', get_ds18b20.get_ds18b20][add_ds18b20]
+            bme280data = get_bme280.get_bme280() if add_bme280 else ''
+            si7021data = get_si7021.get_si7021() if add_si7021 else ''
+            ds18b20data = get_ds18b20.get_ds18b20() if add_ds18b20 else ''
+            message = (get_date()
+                       + str(bme280data)
+                       + str(si7021data)
+                       + str(ds18b20data)
                        )
             update.message.reply_text(message)
         except Exception as e:
