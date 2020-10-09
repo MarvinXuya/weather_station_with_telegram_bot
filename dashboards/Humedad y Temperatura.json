@@ -14,61 +14,62 @@
   },
   "editable": true,
   "gnetId": null,
-  "graphTooltip": 2,
-  "id": 2,
+  "graphTooltip": 0,
+  "id": 1,
   "links": [],
   "panels": [
     {
-      "cacheTimeout": null,
       "datasource": null,
-      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "decimals": 2,
+          "displayName": "",
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "orange",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 3,
+        "w": 5,
         "x": 0,
         "y": 0
       },
-      "id": 6,
-      "links": [],
+      "id": 2,
       "options": {
-        "fieldOptions": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
           "calcs": [
             "mean"
           ],
-          "defaults": {
-            "decimals": 2,
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "orange",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            },
-            "title": "${__field.name}"
-          },
-          "overrides": [],
+          "fields": "",
           "values": false
-        },
-        "orientation": "auto",
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        }
       },
-      "pluginVersion": "6.6.1",
+      "pluginVersion": "7.0.3",
       "targets": [
         {
           "format": "time_series",
           "group": [],
-          "hide": false,
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  date_time AS \"time\",\n  (temperatura + temperatura_ds18b20)/2 as Promedio\nFROM botdata\nWHERE\n  $__timeFilter(date_time)\nORDER BY date_time",
+          "rawSql": "SELECT\ndate_time AS \"time\",  (temperatura + temperatura_ds18b20)/2 as Promedio\nFROM botdata\nWHERE  $__timeFilter(date_time)\nORDER BY date_time\nDESC LIMIT 1",
           "refId": "A",
           "select": [
             [
@@ -96,55 +97,71 @@
       "timeShift": null,
       "title": "Temperatura",
       "transparent": true,
-      "type": "gauge"
+      "type": "stat"
     },
     {
+      "cacheTimeout": null,
       "datasource": null,
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 8
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "decimals": 2,
+          "mappings": [
+            {
+              "id": 0,
+              "op": "=",
+              "text": "N/A",
+              "type": 1,
+              "value": "null"
+            }
+          ],
+          "nullValueMode": "connected",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
       },
-      "id": 4,
+      "gridPos": {
+        "h": 3,
+        "w": 5,
+        "x": 6,
+        "y": 0
+      },
+      "id": 6,
+      "links": [],
       "options": {
-        "fieldOptions": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
           "calcs": [
             "mean"
           ],
-          "defaults": {
-            "decimals": 2,
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "blue",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            },
-            "title": "${__field.name}"
-          },
-          "overrides": [],
+          "fields": "",
           "values": false
-        },
-        "orientation": "auto",
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        }
       },
-      "pluginVersion": "6.6.1",
+      "pluginVersion": "7.0.3",
       "targets": [
         {
           "format": "time_series",
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  date_time AS \"time\",\n  humedad AS Humedad\nFROM botdata\nWHERE\n  $__timeFilter(date_time)\nORDER BY date_time",
+          "rawSql": "SELECT  date_time AS \"time\",  humedad AS Humedad FROM botdata WHERE   $__timeFilter(date_time) ORDER BY date_time  DESC LIMIT 1",
           "refId": "A",
           "select": [
             [
@@ -172,83 +189,66 @@
       "timeShift": null,
       "title": "Humedad",
       "transparent": true,
-      "type": "gauge"
+      "type": "stat"
     },
     {
       "aliasColors": {},
       "bars": false,
-      "cacheTimeout": null,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "MySQL",
+      "datasource": null,
+      "decimals": 2,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 9,
-        "w": 12,
+        "h": 7,
+        "w": 23,
         "x": 0,
-        "y": 16
+        "y": 3
       },
       "hiddenSeries": false,
-      "id": 2,
-      "interval": "",
+      "id": 4,
       "legend": {
         "alignAsTable": true,
         "avg": true,
-        "current": true,
-        "hideEmpty": false,
+        "current": false,
+        "hideEmpty": true,
         "hideZero": false,
         "max": true,
         "min": true,
-        "rightSide": false,
+        "rightSide": true,
         "show": true,
+        "sideWidth": null,
         "total": false,
         "values": true
       },
       "lines": true,
       "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
+      "nullPointMode": "null as zero",
       "options": {
         "dataLinks": []
       },
       "percentage": false,
-      "pluginVersion": "6.6.1",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
-      "seriesOverrides": [
-        {
-          "alias": "temperatura_bme280",
-          "color": "#FF780A"
-        },
-        {
-          "alias": "humedad",
-          "color": "#3274D9"
-        },
-        {
-          "alias": "temperatura_DS18B20",
-          "color": "#56A64B"
-        }
-      ],
+      "seriesOverrides": [],
       "spaceLength": 10,
       "stack": false,
       "steppedLine": true,
       "targets": [
         {
           "format": "time_series",
-          "group": [
-            {
-              "params": [
-                "$__interval",
-                "none"
-              ],
-              "type": "time"
-            }
-          ],
+          "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  $__timeGroupAlias(date_time,$__interval),\n  humedad AS \"Humedad\",\n  temperatura AS \"Temperatura_BME280\",\n  temperatura_DS18B20 AS \"Temperatura_DS18B20\"\nFROM botdata\nWHERE\n  $__timeFilter(date_time)\nGROUP BY 1\nORDER BY $__timeGroup(date_time,$__interval)",
+          "rawSql": "SELECT   \n$__timeGroupAlias(date_time,$__interval),   \nhumedad AS \"Humedad\",   \ntemperatura AS \"Temperatura_BME280\",   \ntemperatura_DS18B20 AS \"Temperatura_DS18B20\" \nFROM botdata \nWHERE   $__timeFilter(date_time) \n#GROUP BY 1 \nORDER BY $__timeGroup(date_time,$__interval)",
           "refId": "A",
           "select": [
             [
@@ -257,38 +257,6 @@
                   "humedad"
                 ],
                 "type": "column"
-              },
-              {
-                "params": [
-                  "avg"
-                ],
-                "type": "aggregate"
-              },
-              {
-                "params": [
-                  "humedad"
-                ],
-                "type": "alias"
-              }
-            ],
-            [
-              {
-                "params": [
-                  "temperatura"
-                ],
-                "type": "column"
-              },
-              {
-                "params": [
-                  "avg"
-                ],
-                "type": "aggregate"
-              },
-              {
-                "params": [
-                  "temperatura"
-                ],
-                "type": "alias"
               }
             ]
           ],
@@ -306,16 +274,7 @@
       ],
       "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [
-        {
-          "colorMode": "background6",
-          "fill": true,
-          "fillColor": "rgba(234, 112, 112, 0.12)",
-          "line": false,
-          "lineColor": "rgba(237, 46, 24, 0.60)",
-          "op": "time"
-        }
-      ],
+      "timeRegions": [],
       "timeShift": null,
       "title": "Humedad y Temperatura",
       "tooltip": {
@@ -336,7 +295,7 @@
         {
           "decimals": 2,
           "format": "short",
-          "label": "",
+          "label": null,
           "logBase": 1,
           "max": null,
           "min": "10",
@@ -344,7 +303,7 @@
         },
         {
           "decimals": 2,
-          "format": "none",
+          "format": "short",
           "label": "",
           "logBase": 1,
           "max": null,
@@ -359,7 +318,7 @@
     }
   ],
   "refresh": false,
-  "schemaVersion": 22,
+  "schemaVersion": 25,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -371,7 +330,6 @@
   },
   "timepicker": {
     "refresh_intervals": [
-      "5s",
       "10s",
       "30s",
       "1m",
@@ -385,6 +343,6 @@
   },
   "timezone": "",
   "title": "Humedad y Temperatura",
-  "uid": "4g66rHkgk",
-  "version": 17
+  "uid": "VB5Jjhmgz",
+  "version": 24
 }

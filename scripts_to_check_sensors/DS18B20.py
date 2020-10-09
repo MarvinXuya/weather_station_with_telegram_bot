@@ -1,18 +1,17 @@
-# DS18B20
+# DS18B20 - smbus2
 # Make sure this is properly set:
 # sudo echo w1-gpio >> /etc/modules
 # sudo echo w1-therm >> /etc/modules
 # sudo echo dtoverlay=w1-gpio >> /boot/config.txt
 
-import glob, time
-import bme280
-import smbus2
-from time import sleep
-import datetime
+import glob
+import time
+
 
 class DS18B20(object):
     def __init__(self):
-        self.device_file = glob.glob("/sys/bus/w1/devices/28*")[0] + "/w1_slave"
+        self.device_file = glob.glob("/sys/bus/w1/devices"
+                                     + "/28*")[0] + "/w1_slave"
 
     def read_temp_raw(self):
         f = open(self.device_file, "r")
@@ -44,5 +43,6 @@ class DS18B20(object):
                 temp_c = float(temp_string)/1000.0
         return temp_c
 
-obj = DS18B20()
-print( obj.read_temp())
+
+temperature = DS18B20()
+print(temperature.read_temp())
