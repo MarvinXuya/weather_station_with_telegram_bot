@@ -10,8 +10,8 @@ import time
 
 class DS18B20(object):
     def __init__(self):
-        self.device_file = glob.glob("/sys/bus/w1/devices/28*")[0]
-        + "/w1_slave"
+        self.device_file = glob.glob("/sys/bus/w1/devices"
+                                     + "/28*")[0] + "/w1_slave"
 
     def read_temp_raw(self):
         f = open(self.device_file, "r")

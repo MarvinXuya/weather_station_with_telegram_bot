@@ -11,13 +11,9 @@ def get_bme280():
         bus = smbus2.SMBus(port)
         bme280.load_calibration_params(bus, address)
         bme280_data = bme280.sample(bus, address)
-        message = ("\nHumidity: " + str(round(bme280_data.humidity, 2)) + "%"
-                   + "\nPresure: " + str(round(bme280_data.pressure, 2))
-                   + "\nTemperature BME280: "
-                   + str(round(bme280_data.temperature, 2)) + "C")
         if 'bus' in locals():
             bus.close()
-        return message
+        return bme280_data
     except Exception:
         if 'bus' in locals():
             bus.close()

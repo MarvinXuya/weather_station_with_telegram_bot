@@ -92,7 +92,6 @@ def echo_start(bot: telegram.Bot, update: telegram.Update):
                    + '\n /check_db'
                    + '\n /covid'
                    + '\n /covid_link'
-                   + '\n /covid_update'
                    + '\n /update_users'
                    )
         update.message.reply_text(message)
@@ -107,7 +106,6 @@ def echo_start(bot: telegram.Bot, update: telegram.Update):
                    + '\n /check_db'
                    + '\n /covid'
                    + '\n /covid_link'
-                   + '\n /covid_update'
                    )
         update.message.reply_text(message)
     elif update.message.from_user.id in COVID_USER:
@@ -274,14 +272,32 @@ def get_weather(bot: telegram.Bot, update: telegram.Update):
     print(update.message.from_user)
     if update.message.from_user.id in USER:
         try:
-            bme280data = get_bme280.get_bme280() if add_bme280 else ''
-            si7021data = get_si7021.get_si7021() if add_si7021 else ''
-            ds18b20data = get_ds18b20.get_ds18b20() if add_ds18b20 else ''
-            message = (get_date()
-                       + str(bme280data)
-                       + str(si7021data)
-                       + str(ds18b20data)
-                       )
+            if add_bme280 is True:
+                bme280data = get_bme280.get_bme280()
+                bme280msg = ("\nHumidity: "
+                             + str(round(bme280data.humidity, 2))
+                             + "%"
+                             + "\nPresure: "
+                             + str(round(bme280data.pressure, 2))
+                             + "\nTemperature BME280: "
+                             + str(round(bme280data.temperature, 2)) + "C")
+            else:
+                bme280msg = ''
+            if add_si7021 is True:
+                si7021data = get_si7021.get_si7021()
+                si7021msg = ("\nTemperature SI7021: "
+                             + "%0.1f C" % si7021data.temperature
+                             + "\nHumidity: "
+                             + "%0.1f %%" % si7021data.relative_humidity)
+            else:
+                si7021msg = ''
+            if add_ds18b20 is True:
+                ds18b20data = get_ds18b20.get_ds18b20()
+                ds18b20msg = ("\nTemperature DS18B20: "
+                              + "%s C {}".format(ds18b20data))
+            else:
+                ds18b20msg = ''
+            message = (get_date() + bme280msg + si7021msg + ds18b20msg)
             update.message.reply_text(message)
         except Exception as e:
             logging.error("Not able to get data from artifacts: {}\n".format(

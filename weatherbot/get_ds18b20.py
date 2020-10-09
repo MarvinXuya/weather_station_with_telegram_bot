@@ -4,7 +4,8 @@ import time
 
 class DS18B20(object):
     def __init__(self):
-        self.device_file = glob.glob("/sys/bus/w1/devices/28*")[0] + "/w1_slave"
+        self.device_file = glob.glob("/sys/bus/w1/devices"
+                                     + "/28*")[0] + "/w1_slave"
 
     def read_temp_raw(self):
         f = open(self.device_file, "r")
@@ -39,5 +40,5 @@ class DS18B20(object):
 
 def get_ds18b20():
     obj = DS18B20()
-    temp_c = ("\nTemperature DS18B20: %s C", obj.read_temp())
-    return temp_c
+    temperature = obj.read_temp()
+    return temperature
