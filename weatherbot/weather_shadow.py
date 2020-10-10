@@ -4,12 +4,13 @@ import MySQLdb
 # Starting weather
 import glob
 import time
-import bme280
-import smbus2
+import get_bme280
+import get_ds18b20
 from time import sleep
 import datetime
 
-CONFIG = json.loads(open('./config_files/config.json', 'r').read())
+CONFIG = json.loads(open('/home/pi/weather_station_with_telegram_bot\
+/config_files/config.json', 'r').read())
 MYSQL_USER = CONFIG['mysql_user']
 MYSQL_PASSWORD = CONFIG['mysql_password']
 MYSQL_DATABASE = CONFIG['mysql_database']
@@ -60,22 +61,28 @@ port = 1
 address = 0x77  # Adafruit BME280 address. Other BME280s may be different
 while True:
     try:
-        bus = smbus2.SMBus(port)
-        bme280.load_calibration_params(bus, address)
-        bme280_data = bme280.sample(bus, address)
-        humidity = bme280_data.humidity
-        pressure = bme280_data.pressure
-        ambient_temperature = bme280_data.temperature
-        now = datetime.datetime.now()
-        obj = DS18B20()
-        temperatura_DS18B20 = obj.read_temp()
-        if 'bus' in locals():
-            bus.close()
+        bme280data = get_bme280.get_bme280()
     except Exception as e:
-        logf.write("Not able to get data from artifacts: {}\n".format(str(e)))
-        if 'bus' in locals():
-            bus.close()
+        logf.write("Not able to get data from bme280: {}\n".format(e))
+    try:
+        humidity = bme280data.humidity
+    except Exception as e:
+        logf.write("Not able to assign humidity from bme280: {}\n".format(e))
+    try:
+        pressure = bme280data.pressure
+    except Exception as e:
+        logf.write("Not able to assign pressure from bme280: {}\n".format(e))
+    try:
+        ambient_temperature = bme280data.temperature
+    except Exception as e:
+        logf.write("Not able to assign temperature "
+                   + "from bme280: {}\n".format(e))
+    try:
+        ds18b20data = get_ds18b20.get_ds18b20()
+    except Exception as e:
+        logf.write("Not able to get data from ds18b20: {}\n".format(e))
         continue
+    now = datetime.datetime.now()
     try:
         connection = MySQLdb.connect(user=MYSQL_USER,
                                      password=MYSQL_PASSWORD,
@@ -86,7 +93,7 @@ while True:
               temperatura, temperatura_DS18B20)
               VALUES (%s, %s, %s, %s, %s)""",
               [(now, humidity, pressure, ambient_temperature,
-                temperatura_DS18B20)])
+                ds18b20data)])
         connection.commit()
         connection.close()
     except Exception as e:
