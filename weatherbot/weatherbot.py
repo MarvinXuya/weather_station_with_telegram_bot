@@ -294,7 +294,7 @@ def get_weather(bot: telegram.Bot, update: telegram.Update):
             if add_ds18b20 is True:
                 ds18b20data = get_ds18b20.get_ds18b20()
                 ds18b20msg = ("\nTemperature DS18B20: "
-                              + "%s C {}".format(ds18b20data))
+                              + " {} C".format(ds18b20data))
             else:
                 ds18b20msg = ''
             message = (get_date() + bme280msg + si7021msg + ds18b20msg)

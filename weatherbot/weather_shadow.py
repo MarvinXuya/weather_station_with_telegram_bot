@@ -21,11 +21,12 @@ sleep_time = config['sleep_time_data_collector_secs']
 # Logs
 logf = open("/var/log/mysql_chango.log", "w")
 # main
-logf.write("Starting data collect with values:" +
-           "\n- BME280: {}\n".format(add_bme280) +
-           "\n- DS18b20: {}\n".format(add_ds18b20) +
-           "\n- SI7021: {}\n".format(add_si7021) +
+logf.write("Starting data collector with values:" +
+           "\n- BME280: {}".format(add_bme280) +
+           "\n- DS18b20: {}".format(add_ds18b20) +
+           "\n- SI7021: {}".format(add_si7021) +
            "\n- Sleep time: {}\n".format(sleep_time))
+logf.flush()
 while True:
     # sensors interaction
     if add_si7021 is True:
@@ -35,6 +36,7 @@ while True:
             except AssertionError as error:
                 logf.write("Not able to get data from si7021" +
                            ": {}\n".format(error))
+                logf.flush()
                 temperature = None
                 humidity = None
                 pressure = None
@@ -50,6 +52,7 @@ while True:
             except AssertionError as error:
                 logf.write("Not able to get data from bme280" +
                            ": {}".format(error))
+                logf.flush()
                 temperature = None
                 humidity = None
                 pressure = None
@@ -59,18 +62,21 @@ while True:
         except AssertionError as error:
             logf.write("Not able to assign humidity from bme280:"
                        + " {}\n".format(error))
+            logf.flush()
             humidity = None
         try:
             pressure = bme280data.pressure
         except AssertionError as error:
             logf.write("Not able to assign pressure from bme280:"
                        + " {}\n".format(error))
+            logf.flush()
             pressure = None
         try:
             temperature = bme280data.temperature
         except AssertionError as error:
             logf.write("Not able to assign temperature "
                        + "from bme280: {}\n".format(error))
+            logf.flush()
             temperature = None
     if add_si7021 is False and add_bme280 is False:
         humidity = None
@@ -81,6 +87,7 @@ while True:
             temperature_ds18b20 = get_ds18b20.get_ds18b20()
         except AssertionError as error:
             logf.write("Not able to get data from ds18b20: {}\n".format(error))
+            logf.flush()
             temperature_ds18b20 = None
             continue
     else:
@@ -93,10 +100,12 @@ while True:
                                      database=mysql_database)
     except Exception as e:
         logf.write("Not able to connect to database: {}\n".format(str(e)))
+        logf.flush()
         if (connection):
             connection.close()
         else:
             logf.write("There is no need to close connection on database")
+            logf.flush()
         continue
     try:
         cursor = connection.cursor()
@@ -111,9 +120,11 @@ while True:
         connection.close()
     except Exception as e:
         logf.write("Not able to insert to database: {}\n".format(str(e)))
+        logf.flush()
         if (connection):
             connection.close()
         else:
             logf.write("There is no need to close connection on database")
+            logf.flush()
         continue
     sleep(sleep_time)
