@@ -12,6 +12,6 @@
     "bme280": "False",
     "ds18b20": "False",
     "si7021": "False",
-    "sleep_time_data_collector_secs": "1200",
+    "sleep_time_data_collector_secs": 1200,
     "COUNTRY": "< country to get covid data from bing>"
 }
