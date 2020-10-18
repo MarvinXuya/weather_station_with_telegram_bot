@@ -1,17 +1,17 @@
-import bme280
-import smbus2
-from time import sleep
+import board
+import busio
+import adafruit_bme280
 
-port = 1
-address = 0x77  # Adafruit BME280 address. Other BME280s may be different
-bus = smbus2.SMBus(port)
 
-bme280.load_calibration_params(bus, address)
-
-while True:
-    bme280_data = bme280.sample(bus, address)
-    humidity = bme280_data.humidity
-    pressure = bme280_data.pressure
-    ambient_temperature = bme280_data.temperature
-    print(humidity, pressure, ambient_temperature)
-    sleep(5)
+try:
+    i2c = busio.I2C(board.SCL, board.SDA)
+    bme280data = adafruit_bme280.Adafruit_BME280_I2C(i2c)
+    print("\nHumidity: "
+          + str(round(bme280data.humidity, 2))
+          + "%"
+          + "\nPresure: "
+          + str(round(bme280data.pressure, 2))
+          + "\nTemperature BME280: "
+          + str(round(bme280data.temperature, 2)) + "C")
+except Exception:
+    print('Not able to get data, make sure bme280 is connected')
