@@ -6,10 +6,14 @@ import adafruit_bme280
 
 
 def get_bme280():
-    try:
-        i2c = busio.I2C(board.SCL, board.SDA)
-        bme280_data = adafruit_bme280.Adafruit_BME280_I2C(i2c)
-        return bme280_data
-    except Exception:
-        bme280_data = 'Not able to get data'
-        return bme280_data
+    while True:
+        try:
+            i2c = busio.I2C(board.SCL, board.SDA)
+        except OSError:
+            continue
+        try:
+            bme280_data = adafruit_bme280.Adafruit_BME280_I2C(i2c)
+            break
+        except OSError:
+            continue
+    return bme280_data
