@@ -21,7 +21,7 @@ Version: python 3.6
 ## Before starting
 - Git should be installed and repository in place:
 ```
-sudo apt-get update
+sudo apt-get update -y
 sudo apt-get install git -y
 git clone https://github.com/MarvinXuya/weather_station_with_telegram_bot.git /home/pi/weather_station_with_telegram_bot
 ```
@@ -37,7 +37,7 @@ Wifi config: https://www.raspberrypi.org/documentation/configuration/wireless/wi
 
 ## Setting all in place
 ```
-bash ./config_files/install.sh <Replace with your bot name>
+sudo bash ./config_files/install.sh <Replace with your bot name>
 ```
 
 ## Parts of Weather station

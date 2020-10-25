@@ -273,28 +273,55 @@ def get_weather(bot: telegram.Bot, update: telegram.Update):
     if update.message.from_user.id in USER:
         try:
             if add_bme280 is True:
-                bme280data = get_bme280.get_bme280()
-                bme280msg = ("\nHumidity: "
-                             + str(round(bme280data.humidity, 2))
-                             + "%"
-                             + "\nPresure: "
-                             + str(round(bme280data.pressure, 2))
-                             + "\nTemperature BME280: "
-                             + str(round(bme280data.temperature, 2)) + "C")
+                bme280_success = False
+                if 'bme280data' not in vars():
+                    try:
+                        bme280data = get_bme280.get_bme280()
+                        bme280_success = True
+                    except AssertionError:
+                        bme280msg = ''
+                if bme280_success is True:
+                    bme280msg = ("\nHumidity: "
+                                 + str(round(bme280data.humidity, 2))
+                                 + "%"
+                                 + "\nPresure: "
+                                 + str(round(bme280data.pressure, 2))
+                                 + "\nTemperature BME280: "
+                                 + str(round(bme280data.temperature, 2)) + "C")
+                else:
+                    bme280msg = ''
             else:
                 bme280msg = ''
             if add_si7021 is True:
-                si7021data = get_si7021.get_si7021()
-                si7021msg = ("\nTemperature SI7021: "
-                             + "%0.1f C" % si7021data.temperature
-                             + "\nHumidity: "
-                             + "%0.1f %%" % si7021data.relative_humidity)
+                si7021_success = False
+                if 'si7021data' not in vars():
+                    try:
+                        si7021data = get_si7021.get_si7021()
+                        si7021_success = True
+                    except AssertionError:
+                        si7021msg = ''
+                if si7021_success is True:
+                    si7021msg = ("\nTemperature SI7021: "
+                                 + "%0.1f C" % si7021data.temperature
+                                 + "\nHumidity: "
+                                 + "%0.1f %%" % si7021data.relative_humidity)
+                else:
+                    si7021msg = ''
             else:
                 si7021msg = ''
             if add_ds18b20 is True:
-                ds18b20data = get_ds18b20.get_ds18b20()
-                ds18b20msg = ("\nTemperature DS18B20: "
-                              + " {} C".format(ds18b20data))
+                ds18b20_success = False
+                if 'ds18b20data' not in vars():
+                    try:
+                        ds18b20data = get_ds18b20.get_ds18b20()
+                        ds18b20_success = True
+                    except AssertionError:
+                        ds18b20msg = ''
+                if ds18b20_success is True:
+                    ds18b20msg = ("\nTemperature DS18B20: "
+                                  + " {} C".format(ds18b20data))
+                else:
+                    ds18b20msg = ''
             else:
                 ds18b20msg = ''
             message = (get_date() + bme280msg + si7021msg + ds18b20msg)
