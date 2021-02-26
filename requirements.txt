@@ -4,7 +4,7 @@ adafruit-circuitpython-busdevice==5.0.1
 adafruit-circuitpython-si7021==3.2.1
 Adafruit-PlatformDetect==2.17.0
 Adafruit-PureIO==1.1.6
-aiohttp==3.6.2
+aiohttp==3.7.4
 async-timeout==3.0.1
 attrs==19.3.0
 certifi==2019.11.28
