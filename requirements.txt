@@ -23,7 +23,7 @@ MCP342x==0.3.4
 multidict==4.7.4
 mysql==0.0.2
 mysqlclient==1.4.4
-numpy==1.18.1
+numpy==1.22.0
 plotly==4.5.0
 pycparser==2.19
 pyftdi==0.52.0
