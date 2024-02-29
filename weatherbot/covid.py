@@ -20,11 +20,14 @@ def get_data(country):
             totalConfirmed = data.get('totalConfirmed')
             totalDeaths = data.get('totalDeaths')
             lastUpdated = data.get('lastUpdated')
+            totalConfirmedDelta = data.get('totalConfirmedDelta')
             active = totalConfirmed - totalRecovered - totalDeaths
-            message = ("\n"+country.capitalize() + ":\n- Active: {}\n- Confirmed: {}\n- Recovered:\
- {}\n- Deaths: {}\n- Data date: {}").format(active, totalConfirmed,
-                                            totalRecovered, totalDeaths,
-                                            lastUpdated)
+            message = ("\n"+country.capitalize()
+                       + ":\n- Active: {}\n- Last confirmed: {}\
+                       \n- Total confirmed: {}\n- Total recovered: {}\
+                       \n- Total deaths: {}\n- Data date: {}\
+                       ").format(active, totalConfirmedDelta, totalConfirmed,
+                                 totalRecovered, totalDeaths, lastUpdated)
             return message
         except Exception:
             message = 'Not able to load json'
@@ -32,3 +35,4 @@ def get_data(country):
     except OSError:
         message = 'Not able to run script to get data'
         return message
+

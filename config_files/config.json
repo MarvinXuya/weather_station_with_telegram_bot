@@ -14,4 +14,10 @@
     "si7021": "False",
     "sleep_time_data_collector_secs": 1200,
     "COUNTRY": "< country to get covid data from bing>"
+    "weather_collectors":[
+        {
+            "name": "<name>",
+            "url": "http://<url>:<port>/<something>"
+        }
+    ]
 }
