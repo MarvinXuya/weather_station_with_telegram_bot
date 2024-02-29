@@ -16,9 +16,12 @@ import datetime
 import get_bme280
 import get_si7021
 import get_ds18b20
+# weather sources
+import weather_collector
 # covid data
 import covid
-
+# system
+import socket
 
 # bot conf
 CONFIG = json.loads(open('/home/pi/weather_station_with_telegram_bot\
@@ -40,6 +43,8 @@ COUNTRY = CONFIG['COUNTRY']
 add_bme280 = CONFIG['bme280']
 add_ds18b20 = CONFIG['ds18b20']
 add_si7021 = CONFIG['si7021']
+weather_collectors = CONFIG['weather_collectors']
+
 # Tunnel conf
 public_url = ""
 # Logs
@@ -93,6 +98,9 @@ def echo_start(bot: telegram.Bot, update: telegram.Update):
                    + '\n /covid'
                    + '\n /covid_link'
                    + '\n /update_users'
+                   + '\n /reboot'
+                   + '\n /grafana'
+                   + '\n /ip'
                    )
         update.message.reply_text(message)
     elif update.message.from_user.id in USER:
@@ -263,7 +271,7 @@ def covid_data(bot: telegram.Bot, update: telegram.Update):
 def covid_link(bot: telegram.Bot, update: telegram.Update):
     if (update.message.from_user.id in USER) \
        or (update.message.from_user.id in COVID_USER):
-        message = "https://www.bing.com/covid/local/guatemala"
+        message = "https://www.bing.com/covid/local/{}".format(COUNTRY.lower())
         update.message.reply_text(message)
 
 
@@ -273,31 +281,62 @@ def get_weather(bot: telegram.Bot, update: telegram.Update):
     if update.message.from_user.id in USER:
         try:
             if add_bme280 is True:
-                bme280data = get_bme280.get_bme280()
-                bme280msg = ("\nHumidity: "
-                             + str(round(bme280data.humidity, 2))
-                             + "%"
-                             + "\nPresure: "
-                             + str(round(bme280data.pressure, 2))
-                             + "\nTemperature BME280: "
-                             + str(round(bme280data.temperature, 2)) + "C")
+                bme280_success = False
+                if 'bme280data' not in vars():
+                    try:
+                        bme280data = get_bme280.get_bme280()
+                        bme280_success = True
+                    except AssertionError:
+                        bme280msg = ''
+                if bme280_success is True:
+                    bme280msg = ("\nHumidity: "
+                                 + str(round(bme280data.humidity, 2))
+                                 + "%"
+                                 + "\nPresure: "
+                                 + str(round(bme280data.pressure, 2))
+                                 + "\nTemperature BME280: "
+                                 + str(round(bme280data.temperature, 2)) + "C")
+                else:
+                    bme280msg = ''
             else:
                 bme280msg = ''
             if add_si7021 is True:
-                si7021data = get_si7021.get_si7021()
-                si7021msg = ("\nTemperature SI7021: "
-                             + "%0.1f C" % si7021data.temperature
-                             + "\nHumidity: "
-                             + "%0.1f %%" % si7021data.relative_humidity)
+                si7021_success = False
+                if 'si7021data' not in vars():
+                    try:
+                        si7021data = get_si7021.get_si7021()
+                        si7021_success = True
+                    except AssertionError:
+                        si7021msg = ''
+                if si7021_success is True:
+                    si7021msg = ("\nTemperature SI7021: "
+                                 + "%0.1f C" % si7021data.temperature
+                                 + "\nHumidity: "
+                                 + "%0.1f %%" % si7021data.relative_humidity)
+                else:
+                    si7021msg = ''
             else:
                 si7021msg = ''
             if add_ds18b20 is True:
-                ds18b20data = get_ds18b20.get_ds18b20()
-                ds18b20msg = ("\nTemperature DS18B20: "
-                              + " {} C".format(ds18b20data))
+                ds18b20_success = False
+                if 'ds18b20data' not in vars():
+                    try:
+                        ds18b20data = get_ds18b20.get_ds18b20()
+                        ds18b20_success = True
+                    except AssertionError:
+                        ds18b20msg = ''
+                if ds18b20_success is True:
+                    ds18b20msg = ("\nTemperature DS18B20: "
+                                  + str(round(ds18b20data, 2)) + 'C')
+                else:
+                    ds18b20msg = ''
             else:
                 ds18b20msg = ''
-            message = (get_date() + bme280msg + si7021msg + ds18b20msg)
+            message = (get_date()
+                       + bme280msg
+                       + si7021msg
+                       + ds18b20msg
+                       + weather_collector.get_collectors(weather_collectors))
             update.message.reply_text(message)
         except Exception as e:
             logging.error("Not able to get data from artifacts: {}\n".format(
@@ -315,6 +354,42 @@ def get_weather(bot: telegram.Bot, update: telegram.Update):
                      update.message.from_user.first_name)
 
 
+def reboot(bot: telegram.Bot, update: telegram.Update):
+    print(update.message.from_user)
+    if update.message.from_user.id in ADMIN_USER:
+        os.system("sudo reboot now")
+    else:
+        reply_deny_message = 'Ops! ' + str(update.message.from_user.first_name)
+        +' you are not allowed to do it.'
+        update.message.reply_text(reply_deny_message)
+        unknown_user(update.message.from_user.id,
+                     update.message.from_user.first_name)
+
+
+def get_ip(bot: telegram.Bot, update: telegram.Update):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    message = "Data from {}: {}".format(get_date(), IP)
+    update.message.reply_text(message)
+
+def grafana(bot: telegram.Bot, update: telegram.Update):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    message = "Data date {}: http://{}:3000".format(get_date(), IP)
+    update.message.reply_text(message)
+
 # Place actions
 dispatcher.add_handler(CommandHandler(['hello', 'start'], echo_start))
 dispatcher.add_handler(CommandHandler('weather', get_weather))
@@ -325,7 +400,12 @@ dispatcher.add_handler(CommandHandler('check_db', get_last_data))
 dispatcher.add_handler(CommandHandler('covid', covid_data))
 dispatcher.add_handler(CommandHandler('covid_link', covid_link))
 dispatcher.add_handler(CommandHandler('update_users', update_users))
+dispatcher.add_handler(CommandHandler('reboot', reboot))
+dispatcher.add_handler(CommandHandler('ip', get_ip))
+dispatcher.add_handler(CommandHandler('grafana', grafana))
+
 
 # Start bot
 updater.start_polling()
 updater.idle()
+
