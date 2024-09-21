@@ -44,6 +44,7 @@ add_bme280 = CONFIG['bme280']
 add_ds18b20 = CONFIG['ds18b20']
 add_si7021 = CONFIG['si7021']
 weather_collectors = CONFIG['weather_collectors']
+source_name = CONFIG["source_name"]
 
 # Tunnel conf
 public_url = ""
@@ -80,7 +81,7 @@ logger.addHandler(log)
 
 def get_date():
     date = datetime.datetime.now()
-    now = str(date.strftime("%Y-%m-%d %H:%M:%S"))
+    now = str(date.strftime("%Y-%m-%d %H:%M:%S")) + "\n"
     return now
 
 
@@ -294,7 +295,7 @@ def get_weather(bot: telegram.Bot, update: telegram.Update):
                                  + "%"
                                  + "\nPresure: "
                                  + str(round(bme280data.pressure, 2))
-                                 + "\nTemperature BME280: "
+                                 + "\nTemperature: "
                                  + str(round(bme280data.temperature, 2)) + "C")
                 else:
                     bme280msg = ''
@@ -326,13 +327,14 @@ def get_weather(bot: telegram.Bot, update: telegram.Update):
                     except AssertionError:
                         ds18b20msg = ''
                 if ds18b20_success is True:
-                    ds18b20msg = ("\nTemperature DS18B20: "
+                    ds18b20msg = ("\nDS18B20: "
                                   + str(round(ds18b20data, 2)) + 'C')
                 else:
                     ds18b20msg = ''
             else:
                 ds18b20msg = ''
             message = (get_date()
+                       + "Source: " + source_name
                        + bme280msg
                        + si7021msg
                        + ds18b20msg
@@ -387,7 +389,7 @@ def grafana(bot: telegram.Bot, update: telegram.Update):
         IP = '127.0.0.1'
     finally:
         s.close()
-    message = "Data date {}: http://{}:3000".format(get_date(), IP)
+    message = "Data date: {}http://{}:3000".format(get_date(), IP)
     update.message.reply_text(message)
 
 # Place actions
@@ -408,4 +410,3 @@ dispatcher.add_handler(CommandHandler('grafana', grafana))
 # Start bot
 updater.start_polling()
 updater.idle()
-

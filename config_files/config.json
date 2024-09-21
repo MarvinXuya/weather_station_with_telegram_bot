@@ -13,10 +13,12 @@
     "ds18b20": "False",
     "si7021": "False",
     "sleep_time_data_collector_secs": 1200,
-    "COUNTRY": "< country to get covid data from bing>"
+    "COUNTRY": "< country to get covid data from bing>",
+    "source_name": "device name, it will be use to print name at telegram display",
     "weather_collectors":[
         {
             "name": "<name>",
+            "hostname": "<hostname>",
             "url": "http://<url>:<port>/<something>"
         }
     ]
