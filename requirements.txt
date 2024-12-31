@@ -14,7 +14,7 @@ colorzero==1.1
 cryptography==44.0.0
 cycler==0.10.0
 Cython==0.29.14
-future==0.18.2
+future==0.18.3
 gpiozero==1.5.1
 idna==3.7
 idna-ssl==1.1.0
